@@ -8,7 +8,7 @@ namespace CleaningRobot
     {
         static void Main(string[] args)
         {
-            CleaningRobot bot = new CleaningRobot(80, 1, 0, "N");
+            CleaningRobot bot = new CleaningRobot(battery: 80, positionX: 3, positionY: 0, facing: "N");
             List<IBasicInstruction> commandList = InstructionsHelper.ConvertToBasicInstrucctions(new string[] { "TL", "A", "C", "A", "C", "TR", "A", "C" });
             String[,] map = new string[4, 4] {
                 { "S", "S", "S", "S" },
@@ -26,18 +26,17 @@ namespace CleaningRobot
     {
         private CleaningRobot bot;
         private List<IBasicInstruction> instructionsList;
-        private String[,] map;
         public Simulation(CleaningRobot cleaningRobot, List<IBasicInstruction> commandList, String[,] map)
         {
             this.instructionsList = commandList;
             this.bot = cleaningRobot;
-            this.map = map;
+            bot.Map = map;
         }
 
         public void Run()
         {
-            bot.ExecuteInstructions(instructionsList, map);
-
+            bot.ExecuteInstructions(instructionsList);
+            bot.PrintResult();
         }
     }
 }
