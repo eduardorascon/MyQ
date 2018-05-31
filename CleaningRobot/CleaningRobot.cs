@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using CleaningRobot.BasicInstructions;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace CleaningRobot
 {
     public class CleaningRobot
     {
-        private List<string> visitedCells, cleanedCells;
+        private List<OutputFile.Cell> visitedCells, cleanedCells;
         private int backOffStrategy = 0;
+
         public string[,] Map { get; set; }
         protected int Battery { get; set; }
         protected int PositionX { get; set; }
@@ -21,16 +24,16 @@ namespace CleaningRobot
             this.PositionY = positionY;
             this.FacingTo = facing;
 
-            this.visitedCells = new List<string>();
-            this.cleanedCells = new List<string>();
+            this.visitedCells = new List<OutputFile.Cell>();
+            this.cleanedCells = new List<OutputFile.Cell>();
         }
 
-        public void ExecuteInstructions(List<IBasicInstruction> instruccionsList)
+        public void ExecuteInstructions(List<IBasicInstruction> instructionsList)
         {
             if (backOffStrategy == 6)
                 return;
 
-            foreach (IBasicInstruction instruction in instruccionsList)
+            foreach (IBasicInstruction instruction in instructionsList)
             {
                 if (this.Battery - instruction.EnergyConsumtion < 0)
                     break;
@@ -60,11 +63,23 @@ namespace CleaningRobot
 
         internal void PrintResult()
         {
-            Console.WriteLine(string.Format("visited : {0}", visitedCells.Count));
-            Console.WriteLine(string.Format("cleaned : {0}", cleanedCells.Count));
-            Console.WriteLine(string.Format("final : X:{0}, Y:{1}, facing:{2}", PositionX, PositionY, FacingTo));
-            Console.WriteLine(string.Format("battery : {0}", Battery));
-            Console.ReadLine();
+            OutputFile outputFile = new OutputFile
+            {
+                visited = visitedCells.ToArray(),
+                cleaned = cleanedCells.ToArray(),
+                final = new OutputFile.Final
+                {
+                    cell = new OutputFile.Cell
+                    {
+                        x = PositionX,
+                        y = PositionY
+                    },
+                    facing = FacingTo
+                },
+                battery = Battery
+            };
+
+            File.WriteAllText(@"d:\json\test1_resssss.json", JsonConvert.SerializeObject(outputFile, Formatting.Indented));
         }
 
         private void GoBack()
@@ -85,7 +100,7 @@ namespace CleaningRobot
                     break;
             }
 
-            visitedCells.Add(string.Format("X:{0}, Y:{1}", this.PositionX, this.PositionY));
+            visitedCells.Add(new OutputFile.Cell { x = PositionX, y = PositionY });
         }
 
         private void GoForward()
@@ -118,7 +133,7 @@ namespace CleaningRobot
                 ExecuteBackOffStrategy(backOffStrategy++);
             }
 
-            visitedCells.Add(string.Format("X:{0}, Y:{1}", this.PositionX, this.PositionY));
+            visitedCells.Add(new OutputFile.Cell { x = PositionX, y = PositionY });
         }
 
         private void ExecuteBackOffStrategy(int backOffStrategy)
@@ -149,7 +164,7 @@ namespace CleaningRobot
 
         private void Clean()
         {
-            cleanedCells.Add(string.Format("X:{0}, Y:{1}", this.PositionX, this.PositionY));
+            cleanedCells.Add(new OutputFile.Cell { x = PositionX, y = PositionY });
         }
 
         private void TurnLeft()
