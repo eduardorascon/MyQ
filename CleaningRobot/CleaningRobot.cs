@@ -38,8 +38,6 @@ namespace CleaningRobot
                 if (this.Battery - instruction.EnergyConsumtion < 0)
                     break;
 
-                this.Battery -= instruction.EnergyConsumtion;
-
                 switch (instruction.InstrucctionName)
                 {
                     case "TL":
@@ -58,6 +56,8 @@ namespace CleaningRobot
                         Clean();
                         break;
                 }
+
+                this.Battery -= instruction.EnergyConsumtion;
             }
         }
 
@@ -126,11 +126,12 @@ namespace CleaningRobot
 
             bool isOutOfBounds = PositionX < 0 || PositionY < 0 || PositionX >= Map.GetLength(0) || PositionY >= Map.GetLength(1);
             bool isValidCell = isOutOfBounds ? false : Map[PositionX, PositionY].Equals("S");
-            if (isValidCell == false || isOutOfBounds)
+            if (isValidCell == false)
             {
                 PositionX = tempPositionX;
                 PositionY = tempPositionY;
-                ExecuteBackOffStrategy(backOffStrategy++);
+                ExecuteBackOffStrategy(++backOffStrategy);
+                return;
             }
 
             visitedCells.Add(new OutputFile.Cell { x = PositionX, y = PositionY });
