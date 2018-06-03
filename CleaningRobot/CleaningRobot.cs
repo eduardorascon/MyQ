@@ -25,6 +25,8 @@ namespace CleaningRobot
             this.FacingTo = facing;
 
             this.visitedCells = new List<OutputFile.Cell>();
+            visitedCells.Add(new OutputFile.Cell { x = positionX, y = PositionY });
+
             this.cleanedCells = new List<OutputFile.Cell>();
         }
 
@@ -79,7 +81,7 @@ namespace CleaningRobot
                 battery = Battery
             };
 
-            File.WriteAllText(@"d:\json\test1_resssss.json", JsonConvert.SerializeObject(outputFile, Formatting.Indented));
+            File.WriteAllText(@"c:\json\test1_resssss.json", JsonConvert.SerializeObject(outputFile, Formatting.Indented));
         }
 
         private void GoBack()
