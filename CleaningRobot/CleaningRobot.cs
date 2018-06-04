@@ -6,8 +6,8 @@ namespace CleaningRobot
 {
     public class CleaningRobot
     {
-        public List<OutputJson.Cell> visitedCells { get; private set; }
-        public List<OutputJson.Cell> cleanedCells { get; set; }
+        public HashSet<OutputJson.Cell> visitedCells { get; private set; }
+        public HashSet<OutputJson.Cell> cleanedCells { get; private set; }
         private int backOffStrategy = 0;
 
         public string[,] Map { get; private set; }
@@ -23,10 +23,10 @@ namespace CleaningRobot
             this.PositionY = inputJson.start.y;
             this.FacingTo = inputJson.start.facing;
 
-            this.visitedCells = new List<OutputJson.Cell>();
-            visitedCells.Add(new OutputJson.Cell { x = PositionX, y = PositionY });
+            this.visitedCells = new HashSet<OutputJson.Cell>();
+            visitedCells.Add(new OutputJson.Cell { X = PositionX, Y = PositionY });
 
-            this.cleanedCells = new List<OutputJson.Cell>();
+            this.cleanedCells = new HashSet<OutputJson.Cell>();
             this.Map = parseMap(inputJson.map);
 
         }
@@ -95,7 +95,7 @@ namespace CleaningRobot
                     break;
             }
 
-            visitedCells.Add(new OutputJson.Cell { x = PositionX, y = PositionY });
+            visitedCells.Add(new OutputJson.Cell { X = PositionX, Y = PositionY });
         }
 
         private void GoForward()
@@ -129,7 +129,7 @@ namespace CleaningRobot
                 return;
             }
 
-            visitedCells.Add(new OutputJson.Cell { x = PositionX, y = PositionY });
+            visitedCells.Add(new OutputJson.Cell { X = PositionX, Y = PositionY });
         }
 
         private void ExecuteBackOffStrategy(int backOffStrategyNumber)
@@ -160,7 +160,7 @@ namespace CleaningRobot
 
         private void Clean()
         {
-            cleanedCells.Add(new OutputJson.Cell { x = PositionX, y = PositionY });
+            cleanedCells.Add(new OutputJson.Cell { X = PositionX, Y = PositionY });
         }
 
         private void TurnLeft()
