@@ -51,18 +51,12 @@ namespace CleaningRobot.BasicInstructions
 
         public int EnergyConsumtion
         {
-            get
-            {
-                return 1;
-            }
+            get { return 1; }
         }
 
         public string InstrucctionName
         {
-            get
-            {
-                return "TL";
-            }
+            get { return "TL"; }
         }
     }
 
@@ -70,18 +64,12 @@ namespace CleaningRobot.BasicInstructions
     {
         public int EnergyConsumtion
         {
-            get
-            {
-                return 1;
-            }
+            get { return 1; }
         }
 
         public string InstrucctionName
         {
-            get
-            {
-                return "TR";
-            }
+            get { return "TR"; }
         }
     }
 
@@ -89,18 +77,12 @@ namespace CleaningRobot.BasicInstructions
     {
         public int EnergyConsumtion
         {
-            get
-            {
-                return 2;
-            }
+            get { return 2; }
         }
 
         public string InstrucctionName
         {
-            get
-            {
-                return "A";
-            }
+            get { return "A"; }
         }
     }
 
@@ -108,17 +90,11 @@ namespace CleaningRobot.BasicInstructions
     {
         public int EnergyConsumtion
         {
-            get
-            {
-                return 4;
-            }
+            get { return 3; }
         }
         public string InstrucctionName
         {
-            get
-            {
-                return "B";
-            }
+            get { return "B"; }
         }
     }
 
@@ -126,18 +102,12 @@ namespace CleaningRobot.BasicInstructions
     {
         public int EnergyConsumtion
         {
-            get
-            {
-                return 5;
-            }
+            get { return 5; }
         }
 
         public string InstrucctionName
         {
-            get
-            {
-                return "C";
-            }
+            get { return "C"; }
         }
     }
 }
