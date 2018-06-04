@@ -79,8 +79,11 @@
   <ItemGroup>
     <Compile Include="CleaningRobot.cs" />
     <Compile Include="IBasicInstruction.cs" />
+    <Compile Include="InputJson.cs" />
+    <Compile Include="OutputJson.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Simulation.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
