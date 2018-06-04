@@ -1,33 +1,47 @@
-﻿using System;
+﻿using CleaningRobot.BasicInstructions;
+using System;
 using System.Collections.Generic;
-using CleaningRobot.BasicInstructions;
-using Newtonsoft.Json;
-using System.IO;
 
 namespace CleaningRobot
 {
     public class CleaningRobot
     {
-        private List<OutputFile.Cell> visitedCells, cleanedCells;
+        public List<OutputJson.Cell> visitedCells { get; private set; }
+        public List<OutputJson.Cell> cleanedCells { get; set; }
         private int backOffStrategy = 0;
 
-        public string[,] Map { get; set; }
-        protected int Battery { get; set; }
-        protected int PositionX { get; set; }
-        protected int PositionY { get; set; }
-        protected String FacingTo { get; set; }
+        public string[,] Map { get; private set; }
+        public int Battery { get; private set; }
+        public int PositionX { get; private set; }
+        public int PositionY { get; private set; }
+        public string FacingTo { get; private set; }
 
-        public CleaningRobot(int battery, int positionX, int positionY, String facing)
+        public CleaningRobot(InputJson inputJson)
         {
-            this.Battery = battery;
-            this.PositionX = positionX;
-            this.PositionY = positionY;
-            this.FacingTo = facing;
+            this.Battery = inputJson.battery;
+            this.PositionX = inputJson.start.x;
+            this.PositionY = inputJson.start.y;
+            this.FacingTo = inputJson.start.facing;
 
-            this.visitedCells = new List<OutputFile.Cell>();
-            visitedCells.Add(new OutputFile.Cell { x = positionX, y = PositionY });
+            this.visitedCells = new List<OutputJson.Cell>();
+            visitedCells.Add(new OutputJson.Cell { x = PositionX, y = PositionY });
 
-            this.cleanedCells = new List<OutputFile.Cell>();
+            this.cleanedCells = new List<OutputJson.Cell>();
+            this.Map = parseMap(inputJson.map);
+
+        }
+
+        private static string[,] parseMap(string[,] map)
+        {
+            int lengthX = map.GetLength(0);
+            int lengthY = map.GetLength(1);
+            string[,] tempMap = new string[lengthX, lengthY];
+
+            for (int i = 0; i < lengthX; i++)
+                for (int j = 0; j < lengthY; j++)
+                    tempMap[i, j] = map[j, i];
+
+            return tempMap;
         }
 
         public void ExecuteInstructions(List<IBasicInstruction> instructionsList)
@@ -63,27 +77,6 @@ namespace CleaningRobot
             }
         }
 
-        internal void PrintResult()
-        {
-            OutputFile outputFile = new OutputFile
-            {
-                visited = visitedCells.ToArray(),
-                cleaned = cleanedCells.ToArray(),
-                final = new OutputFile.Final
-                {
-                    cell = new OutputFile.Cell
-                    {
-                        x = PositionX,
-                        y = PositionY
-                    },
-                    facing = FacingTo
-                },
-                battery = Battery
-            };
-
-            File.WriteAllText(@"c:\json\test1_resssss.json", JsonConvert.SerializeObject(outputFile, Formatting.Indented));
-        }
-
         private void GoBack()
         {
             switch (this.FacingTo)
@@ -102,7 +95,7 @@ namespace CleaningRobot
                     break;
             }
 
-            visitedCells.Add(new OutputFile.Cell { x = PositionX, y = PositionY });
+            visitedCells.Add(new OutputJson.Cell { x = PositionX, y = PositionY });
         }
 
         private void GoForward()
@@ -136,13 +129,13 @@ namespace CleaningRobot
                 return;
             }
 
-            visitedCells.Add(new OutputFile.Cell { x = PositionX, y = PositionY });
+            visitedCells.Add(new OutputJson.Cell { x = PositionX, y = PositionY });
         }
 
-        private void ExecuteBackOffStrategy(int backOffStrategy)
+        private void ExecuteBackOffStrategy(int backOffStrategyNumber)
         {
             List<IBasicInstruction> instructions = null;
-            switch (backOffStrategy)
+            switch (backOffStrategyNumber)
             {
                 case 1:
                     instructions = InstructionsHelper.ConvertToBasicInstrucctions(new[] { "TR", "A" });
@@ -167,7 +160,7 @@ namespace CleaningRobot
 
         private void Clean()
         {
-            cleanedCells.Add(new OutputFile.Cell { x = PositionX, y = PositionY });
+            cleanedCells.Add(new OutputJson.Cell { x = PositionX, y = PositionY });
         }
 
         private void TurnLeft()
@@ -188,6 +181,7 @@ namespace CleaningRobot
                     break;
             }
         }
+
         private void TurnRight()
         {
             switch (this.FacingTo)

@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using CleaningRobot.BasicInstructions;
+﻿using CleaningRobot.BasicInstructions;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace CleaningRobot
@@ -10,18 +10,21 @@ namespace CleaningRobot
     {
         static void Main(string[] args)
         {
-            InputFile inputFile = JsonConvert.DeserializeObject<InputFile>(File.ReadAllText(@"d:\json\test1.json"));
+            string inputFile = @"C:\publicacion\test2.json"; // args[0];
+            string outputFile = @"C:\publicacion\test2_result222.json"; // args[1];
 
-            CleaningRobot bot = new CleaningRobot(inputFile.battery, inputFile.start.x, inputFile.start.y, inputFile.start.facing);
-            List<IBasicInstruction> commandList = InstructionsHelper.ConvertToBasicInstrucctions(inputFile.commands);
-            string[,] map = inputFile.map;
+            InputJson inputJson = JsonConvert.DeserializeObject<InputJson>(File.ReadAllText(inputFile));
 
-            Simulation simulation = new Simulation(bot, commandList, map);
+            CleaningRobot bot = new CleaningRobot(inputJson);
+            List<IBasicInstruction> commandList = InstructionsHelper.ConvertToBasicInstrucctions(inputJson.commands);
+
+            Simulation simulation = new Simulation(bot, commandList);
             simulation.Run();
+            simulation.PrintResult(outputFile);
         }
     }
 
-    public class OutputFile
+    public class OutputJson
     {
         public Cell[] visited { get; set; }
         public Cell[] cleaned { get; set; }
@@ -40,7 +43,7 @@ namespace CleaningRobot
         }
     }
 
-    public class InputFile
+    public class InputJson
     {
         public string[,] map { get; set; }
         public StartJson start { get; set; }
@@ -59,17 +62,44 @@ namespace CleaningRobot
     {
         private CleaningRobot bot;
         private List<IBasicInstruction> instructionsList;
-        public Simulation(CleaningRobot cleaningRobot, List<IBasicInstruction> commandList, String[,] map)
+        public Simulation(CleaningRobot cleaningRobot, List<IBasicInstruction> commandList)
         {
             this.instructionsList = commandList;
             this.bot = cleaningRobot;
-            bot.Map = map;
         }
 
         public void Run()
         {
             bot.ExecuteInstructions(instructionsList);
-            bot.PrintResult();
+        }
+
+        public void PrintResult(string outputFile)
+        {
+            OutputJson outputJson = new OutputJson
+            {
+                visited = bot.visitedCells.ToArray(),
+                cleaned = bot.cleanedCells.ToArray(),
+                final = new OutputJson.Final
+                {
+                    cell = new OutputJson.Cell
+                    {
+                        x = bot.PositionX,
+                        y = bot.PositionY
+                    },
+                    facing = bot.FacingTo
+                },
+                battery = bot.Battery
+            };
+
+            try
+            {
+                File.WriteAllText(outputFile, JsonConvert.SerializeObject(outputJson, Formatting.Indented));
+            }
+            catch (Exception ex)
+            {
+                Console.Write("Privilegios?" + ex.Message);
+                Console.ReadLine();
+            }
         }
     }
 }
